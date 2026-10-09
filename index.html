@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Bahir Dar University Statistics and Data Science class timetable">
+  <title>BDU | Class Schedule</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">BDU</div>
+        <div><strong>Academic Hub</strong><span>Bahir Dar University</span></div>
+      </div>
+      <div class="side-label">WORKSPACE</div>
+      <a class="nav-link active" href="#overview"><span class="nav-icon">▦</span> Class schedule</a>
+      <a class="nav-link" href="#free-time"><span class="nav-icon">◷</span> Free time finder</a>
+      <a class="nav-link" href="#calendar"><span class="nav-icon">▣</span> Academic calendar</a>
+      <div class="sidebar-bottom">
+        <div class="help-icon">?</div>
+        <div><strong>Need help?</strong><span>Check the timetable notes</span></div>
+      </div>
+    </aside>
+
+    <main class="main-content" id="overview">
+      <header class="topbar">
+        <div class="breadcrumbs">Academic services <span>/</span> Timetable</div>
+        <div class="topbar-right"><span class="status-dot"></span><span>2019 E.C. · Semester I</span><div class="avatar">DS</div></div>
+      </header>
+
+      <section class="welcome">
+        <div>
+          <div class="eyebrow">DEPARTMENT OF STATISTICS & DATA SCIENCE</div>
+          <h1>Class schedule<span>.</span></h1>
+          <p>Find your classes, check instructor schedules, and discover free periods.</p>
+        </div>
+        <div class="welcome-art" aria-hidden="true">
+          <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
+          <div class="art-calendar"><div class="art-calendar-top"></div><div class="art-calendar-grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+          <div class="art-dot"></div>
+        </div>
+      </section>
+
+      <section class="filter-panel">
+        <div class="panel-heading"><div><span class="section-kicker">QUICK SEARCH</span><h2>Build your timetable</h2></div><button id="resetFilters" class="text-button">Reset filters ↺</button></div>
+        <div class="filters">
+          <label>Student group<select id="groupFilter"><option value="all">All student groups</option></select></label>
+          <label>Teacher<select id="teacherFilter"><option value="all">All teachers</option></select></label>
+          <label>Day<select id="dayFilter"><option value="all">All days</option><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option></select></label>
+          <button id="applyFilters" class="primary-button"><span>⌕</span> Find classes</button>
+        </div>
+      </section>
+
+      <section class="stats-grid">
+        <article class="stat-card"><div class="stat-icon blue">▦</div><div><span>Courses listed</span><strong id="courseCount">0</strong><small>Across all groups</small></div></article>
+        <article class="stat-card"><div class="stat-icon purple">♙</div><div><span>Instructors</span><strong id="teacherCount">0</strong><small>Named in the source schedule</small></div></article>
+        <article class="stat-card"><div class="stat-icon green">◷</div><div><span>Class days</span><strong>5</strong><small>Monday to Friday</small></div></article>
+      </section>
+
+      <section class="schedule-section">
+        <div class="section-title-row">
+          <div><span class="section-kicker">YOUR RESULTS</span><h2>Weekly timetable</h2><p id="resultSummary">Showing all available course entries</p></div>
+          <div class="view-toggle"><button class="view-btn active" data-view="cards">Cards</button><button class="view-btn" data-view="table">Table</button></div>
+        </div>
+        <div class="day-tabs" id="dayTabs">
+          <button class="day-tab active" data-day="all">All days</button><button class="day-tab" data-day="Monday">Mon</button><button class="day-tab" data-day="Tuesday">Tue</button><button class="day-tab" data-day="Wednesday">Wed</button><button class="day-tab" data-day="Thursday">Thu</button><button class="day-tab" data-day="Friday">Fri</button>
+        </div>
+        <div id="scheduleResults" class="schedule-grid"></div>
+        <div id="emptyState" class="empty-state hidden"><div>⌕</div><h3>No classes match those filters</h3><p>Try choosing another group, teacher, or day.</p><button id="clearEmpty" class="primary-button">Clear filters</button></div>
+      </section>
+
+      <section class="lower-grid">
+        <article class="content-panel" id="free-time">
+          <div class="section-title-row compact"><div><span class="section-kicker">PLAN AHEAD</span><h2>Free time finder</h2><p>Check open periods for a group, instructor, or room.</p></div><div class="free-icon">◷</div></div>
+          <div class="free-controls">
+            <label>Check availability for<select id="freeType"><option value="group">Student group</option><option value="teacher">Teacher</option><option value="room">Room</option></select></label>
+            <label>Choose one<select id="freeEntity"></select></label>
+            <label>Day<select id="freeDay"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option></select></label>
+          </div>
+          <div id="freeResults" class="free-results"></div>
+          <p class="fine-print">Free periods are inferred from the course entries entered in this demo. Verify with the department before relying on them.</p>
+        </article>
+
+        <article class="content-panel calendar-panel" id="calendar">
+          <div class="section-title-row compact"><div><span class="section-kicker">AT A GLANCE</span><h2>Academic calendar</h2><p>October 2026</p></div><div class="calendar-icon">▣</div></div>
+          <div class="calendar-head"><button id="prevMonth" aria-label="Previous month">‹</button><strong id="monthLabel">October 2026</strong><button id="nextMonth" aria-label="Next month">›</button></div>
+          <div class="calendar-weekdays"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+          <div id="calendarDays" class="calendar-days"></div>
+          <div class="calendar-legend"><span><i class="legend-class"></i> Today</span><span><i class="legend-weekend"></i> Weekend</span></div>
+        </article>
+      </section>
+
+      <footer><span>© 2019 E.C. · Bahir Dar University</span><span>Statistics & Data Science · Timetable prototype</span></footer>
+    </main>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
