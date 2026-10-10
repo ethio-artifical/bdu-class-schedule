@@ -64,7 +64,19 @@ fillSelect(teacherFilter,unique(courses.map(c=>c.teacher)));
 document.getElementById("courseCount").textContent=courses.length;
 document.getElementById("teacherCount").textContent=unique(courses.map(c=>c.teacher).filter(t=>t!=="TBA")).length;
 
-function expandCourse(c){return c.slots.flatMap(([day,periods])=>periods.map(p=>({course:c,day,period:p,time:PERIODS.find(x=>x.n===p).time})))}
+// Keep consecutive periods for the same course/day together (e.g. 1–2, 3–4, or 5–7).
+// If there is a gap, start a separate session (e.g. periods 3–4 and 7).
+function expandCourse(c){
+ return c.slots.flatMap(([day,periods])=>{
+  const sorted=[...periods].sort((a,b)=>a-b), runs=[];
+  sorted.forEach(p=>{
+   const last=runs[runs.length-1];
+   if(last && p===last[last.length-1]+1) last.push(p); else runs.push([p]);
+  });
+  return runs.map(run=>({course:c,day,period:run[0],periodEnd:run[run.length-1],periods:run,
+   time:`${PERIODS.find(x=>x.n===run[0]).time.split('–')[0]}–${PERIODS.find(x=>x.n===run[run.length-1]).time.split('–')[1]}`}));
+ });
+}
 function filteredEntries(){
  const g=groupFilter.value,t=teacherFilter.value,d=dayFilter.value;
  return courses.flatMap(expandCourse).filter(e=>(g==="all"||e.course.group===g)&&(t==="all"||e.course.teacher===t)&&(d==="all"||e.day===d)&&(activeDay==="all"||e.day===activeDay)).sort((a,b)=>DAYS.indexOf(a.day)-DAYS.indexOf(b.day)||a.period-b.period||a.course.title.localeCompare(b.course.title));
@@ -80,10 +92,10 @@ function render(){
    const table=document.createElement("table");table.className="schedule-table";
    table.innerHTML="<thead><tr><th>Course</th><th>Code</th><th>Group</th><th>Day</th><th>Period</th><th>Time</th><th>Instructor</th><th>Room</th></tr></thead>";
    const tbody=document.createElement("tbody");
-   entries.forEach(e=>{const tr=document.createElement("tr");tr.innerHTML=`<td><strong>${e.course.title}</strong></td><td>${e.course.code}</td><td>${e.course.group}</td><td>${e.day}</td><td>${e.period}</td><td>${e.time}</td><td>${e.course.teacher}</td><td>${e.course.room}</td>`;tbody.appendChild(tr)});
+   entries.forEach(e=>{const tr=document.createElement("tr");tr.innerHTML=`<td><strong class="course-name-text">${e.course.title}</strong></td><td>${e.course.code}</td><td>${e.course.group}</td><td>${e.day}</td><td>${e.periodEnd===e.period?e.period:`${e.period}–${e.periodEnd}`}</td><td>${e.time}</td><td>${e.course.teacher}</td><td>${e.course.room}</td>`;tbody.appendChild(tr)});
    table.appendChild(tbody);results.appendChild(table);
  }else{
-   entries.forEach((e,i)=>{const c=e.course;const card=document.createElement("article");card.className="course-card";card.style.setProperty("--accent",palette[unique(courses.map(x=>x.group)).indexOf(c.group)%palette.length]);card.innerHTML=`<div class="course-top"><span class="course-code">${c.code}</span><span class="course-day">${e.day} · Period ${e.period}</span></div><h3>${c.title}</h3><div class="course-meta"><span>◷ ${e.time}</span><span>▤ ${c.credits} Cr.Hr</span></div><div class="group-tag">${c.group}</div><div class="course-footer"><span>Instructor<br><strong>${c.teacher}</strong></span><span>Room<br><strong>${c.room}</strong></span></div>`;results.appendChild(card)});
+   entries.forEach((e,i)=>{const c=e.course;const card=document.createElement("article");card.className="course-card";card.style.setProperty("--accent",palette[unique(courses.map(x=>x.group)).indexOf(c.group)%palette.length]);card.innerHTML=`<div class="course-top"><span class="course-code">${c.code}</span><span class="course-day">${e.day} · Period ${e.periodEnd===e.period?e.period:`${e.period}–${e.periodEnd}`}</span></div><h3 class="course-name-text">${c.title}</h3><div class="course-meta"><span>◷ ${e.time}</span><span>▤ ${c.credits} Cr.Hr</span></div><div class="group-tag">${c.group}</div><div class="course-footer"><span>Instructor<br><strong>${c.teacher}</strong></span><span>Room<br><strong>${c.room}</strong></span></div>`;results.appendChild(card)});
  }
 }
 function clearFilters(){groupFilter.value="all";teacherFilter.value="all";dayFilter.value="all";activeDay="all";document.querySelectorAll(".day-tab").forEach(b=>b.classList.toggle("active",b.dataset.day==="all"));render()}
@@ -128,3 +140,4 @@ function renderCalendar(){
 document.getElementById("prevMonth").addEventListener("click",()=>{monthDate.setMonth(monthDate.getMonth()-1);renderCalendar()});
 document.getElementById("nextMonth").addEventListener("click",()=>{monthDate.setMonth(monthDate.getMonth()+1);renderCalendar()});
 updateFreeEntity();renderCalendar();render();
+
